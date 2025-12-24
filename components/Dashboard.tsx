@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Transaction, TransactionType, View } from '../types';
 import { CATEGORY_COLORS } from '../constants';
-import { ArrowUpRight, ArrowDownRight, Wallet, Settings as SettingsIcon } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, Wallet, Settings as SettingsIcon, CreditCard } from 'lucide-react';
 
 interface DashboardProps {
   transactions: Transaction[];
@@ -9,12 +9,12 @@ interface DashboardProps {
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ transactions, onNavigate }) => {
-  const { totalBalance, monthlyIncome, monthlyExpense } = useMemo(() => {
+  const { totalExpenses, monthlyIncome, monthlyExpense } = useMemo(() => {
     const now = new Date();
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
 
-    let balance = 0;
+    let totalExp = 0;
     let mIncome = 0;
     let mExpense = 0;
 
@@ -23,19 +23,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ transactions, onNavigate }
       const amount = t.amount;
 
       if (t.type === TransactionType.INCOME) {
-        balance += amount;
         if (tDate.getMonth() === currentMonth && tDate.getFullYear() === currentYear) {
           mIncome += amount;
         }
       } else {
-        balance -= amount;
+        totalExp += amount;
         if (tDate.getMonth() === currentMonth && tDate.getFullYear() === currentYear) {
           mExpense += amount;
         }
       }
     });
 
-    return { totalBalance: balance, monthlyIncome: mIncome, monthlyExpense: mExpense };
+    return { totalExpenses: totalExp, monthlyIncome: mIncome, monthlyExpense: mExpense };
   }, [transactions]);
 
   const recentTransactions = [...transactions].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
@@ -71,11 +70,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ transactions, onNavigate }
             <div className="relative p-7 rounded-[2.2rem] bg-gradient-to-br from-white/60 to-white/10 dark:from-white/5 dark:to-transparent backdrop-blur-md">
                 <div className="flex justify-between items-start mb-6">
                     <div>
-                        <p className="text-slate-500 dark:text-slate-300 text-sm font-semibold tracking-wide uppercase">Total Balance</p>
-                        <h2 className="text-5xl font-bold text-slate-800 dark:text-white mt-2 tracking-tight">{formatCurrency(totalBalance)}</h2>
+                        <p className="text-slate-500 dark:text-slate-300 text-sm font-semibold tracking-wide uppercase">Total Expenses</p>
+                        <h2 className="text-5xl font-bold text-slate-800 dark:text-white mt-2 tracking-tight">{formatCurrency(totalExpenses)}</h2>
                     </div>
                     <div className="bg-white/50 dark:bg-white/10 p-3 rounded-2xl shadow-sm border border-white/60 dark:border-white/5 text-brand-600 dark:text-cyan-400">
-                        <Wallet size={24} />
+                        <CreditCard size={24} />
                     </div>
                 </div>
                 
