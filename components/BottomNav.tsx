@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, PieChart, Plus, Sparkles } from 'lucide-react';
+import { Home, PieChart, Plus } from 'lucide-react';
 import { View } from '../types';
 
 interface BottomNavProps {
@@ -30,7 +30,6 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentView, onViewChange 
             {/* Left Group */}
             <div className="col-span-2 flex justify-evenly items-center pr-4">
                 <NavButton view={View.DASHBOARD} icon={Home} />
-                <NavButton view={View.ANALYTICS} icon={PieChart} />
             </div>
 
             {/* Center Spacer for Add Button */}
@@ -38,8 +37,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentView, onViewChange 
 
             {/* Right Group */}
             <div className="col-span-2 flex justify-evenly items-center pl-4">
-                <NavButton view={View.AI_ADVISOR} icon={Sparkles} />
-                {/* Placeholder for symmetry or future feature, otherwise visual balance handles it */}
+                <NavButton view={View.ANALYTICS} icon={PieChart} />
             </div>
 
             {/* Floating Add Button (Absolute) */}
