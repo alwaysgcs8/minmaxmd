@@ -8,6 +8,9 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
+    build: {
+      target: 'es2020',
+    },
     define: {
       // Polyfill process.env.API_KEY for the Gemini SDK
       // Default to empty string if undefined to prevent build/runtime errors

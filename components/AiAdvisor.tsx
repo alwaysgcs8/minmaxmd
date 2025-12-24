@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Transaction } from '../types';
 import { getBudgetAnalysis } from '../services/geminiService';
 import { Sparkles, RefreshCw, Bot } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
 
 interface AiAdvisorProps {
   transactions: Transaction[];
@@ -31,6 +30,54 @@ export const AiAdvisor: React.FC<AiAdvisorProps> = ({ transactions }) => {
     setAnalysis(result);
     setLoading(false);
     setHasFetched(true);
+  };
+
+  // Simple Markdown Parser to avoid regex lookbehind issues in libraries
+  const renderMarkdown = (text: string) => {
+    const lines = text.split('\n');
+    return lines.map((line, index) => {
+      // Bold parsing helper
+      const parseBold = (str: string) => {
+        const parts = str.split('**');
+        return parts.map((part, i) => 
+          i % 2 === 1 ? <strong key={i} className="font-bold text-brand-700 dark:text-brand-300">{part}</strong> : part
+        );
+      };
+
+      // Headers
+      if (line.startsWith('### ')) {
+        return <h3 key={index} className="text-lg font-bold mt-4 mb-2 text-slate-800 dark:text-white">{parseBold(line.replace('### ', ''))}</h3>;
+      }
+      if (line.startsWith('## ')) {
+        return <h2 key={index} className="text-xl font-bold mt-5 mb-3 text-slate-800 dark:text-white">{parseBold(line.replace('## ', ''))}</h2>;
+      }
+      
+      // Lists
+      if (line.startsWith('1. ')) {
+        return (
+          <div key={index} className="ml-4 mb-2 flex gap-2">
+            <span className="font-bold text-brand-500">{line.split('. ')[0]}.</span>
+            <span className="text-slate-700 dark:text-slate-300">{parseBold(line.substring(3))}</span>
+          </div>
+        );
+      }
+      if (line.trim().startsWith('- ') || line.trim().startsWith('* ')) {
+        return (
+            <div key={index} className="ml-4 mb-2 flex gap-2">
+              <span className="text-brand-500">•</span>
+              <span className="text-slate-700 dark:text-slate-300">{parseBold(line.replace(/^[\-\*] /, ''))}</span>
+            </div>
+        );
+      }
+
+      // Empty lines
+      if (!line.trim()) {
+        return <div key={index} className="h-2"></div>;
+      }
+
+      // Paragraphs
+      return <p key={index} className="mb-2 text-slate-700 dark:text-slate-300 leading-relaxed">{parseBold(line)}</p>;
+    });
   };
 
   return (
@@ -72,9 +119,7 @@ export const AiAdvisor: React.FC<AiAdvisorProps> = ({ transactions }) => {
 
         {analysis && !loading && (
              <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-2xl p-8 rounded-[2.5rem] shadow-glass border border-white/60 dark:border-white/10">
-                <div className="prose prose-slate dark:prose-invert prose-headings:font-bold prose-headings:text-slate-800 dark:prose-headings:text-white prose-p:text-slate-700 dark:prose-p:text-slate-300 prose-li:text-slate-700 dark:prose-li:text-slate-300 prose-strong:text-brand-700 dark:prose-strong:text-brand-300 max-w-none">
-                    <ReactMarkdown>{analysis}</ReactMarkdown>
-                </div>
+                {renderMarkdown(analysis)}
             </div>
         )}
       </div>

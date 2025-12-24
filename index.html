@@ -118,5 +118,18 @@
   <body class="liquid-bg h-[100dvh] w-full overflow-hidden text-slate-900 dark:text-slate-100 selection:bg-brand-500/30">
     <div id="root" class="h-full w-full"></div>
     <script type="module" src="/index.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+              console.log('SW registered:', registration);
+            })
+            .catch(error => {
+              console.log('SW registration failed:', error);
+            });
+        });
+      }
+    </script>
   </body>
 </html>
