@@ -62,12 +62,32 @@
         }
       }
     </script>
+    
+    <!-- THE FIX: Calculate actual viewport height (vh) via JS to handle iOS bars correctly -->
+    <script>
+      const setVh = () => {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+      };
+      
+      window.addEventListener('resize', setVh);
+      window.addEventListener('orientationchange', setVh);
+      
+      // Run immediately
+      setVh();
+      
+      // Also run on load to be sure
+      window.addEventListener('DOMContentLoaded', setVh);
+    </script>
+
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
       
       :root {
         --bg-light: #ffffff; 
         --bg-dark: #0f172a;
+        /* Fallback if JS fails */
+        --vh: 1vh; 
       }
 
       html {
@@ -84,7 +104,8 @@
         height: 100%;
         margin: 0;
         padding: 0;
-        overflow: hidden; /* Prevent body scroll */
+        /* CRITICAL: Lock body scroll so only #root scrolls */
+        overflow: hidden; 
         background-color: var(--bg-light);
       }
       
@@ -92,18 +113,34 @@
         background-color: var(--bg-dark);
       }
 
-      /* The main scrollable container */
+      /* 
+         THE ROOT SCROLLER 
+         Uses the calculated --vh to exactly match the visible screen area.
+      */
       #root {
         position: fixed;
-        inset: 0; 
+        top: 0;
+        left: 0;
+        width: 100%;
+        
+        /* The magic height calculation */
+        height: calc(var(--vh, 1vh) * 100);
+        
+        /* Internal scrolling */
         overflow-y: auto;
         overflow-x: hidden;
         -webkit-overflow-scrolling: touch; 
+        
+        /* Layout */
         z-index: 10;
         scroll-behavior: smooth;
+        
+        /* Handle Safe Areas */
+        padding-bottom: env(safe-area-inset-bottom);
+        box-sizing: border-box;
       }
 
-      /* Background Layer - Subtle Gradients for White Theme */
+      /* Background Layer - Oversized to cover rubber banding if it happens */
       #app-background {
         position: fixed;
         top: -50vh;
@@ -113,7 +150,6 @@
         z-index: 0;
         pointer-events: none;
         
-        /* Very subtle, barely there gradients for depth on white */
         background: radial-gradient(circle at 50% 50%, rgba(248, 250, 252, 1), rgba(255, 255, 255, 0) 60%),
                     radial-gradient(circle at 80% 10%, rgba(241, 245, 249, 0.8), rgba(255, 255, 255, 0) 40%),
                     radial-gradient(circle at 20% 90%, rgba(241, 245, 249, 0.8), rgba(255, 255, 255, 0) 40%);
@@ -169,6 +205,7 @@
 </head>
   <body class="text-slate-900 dark:text-slate-100 selection:bg-brand-500/30">
     <div id="app-background"></div>
+    <!-- Root is the scroll container sized by JS -->
     <div id="root"></div>
     
     <script type="module" src="/index.tsx"></script>

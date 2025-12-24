@@ -39,8 +39,7 @@ const App: React.FC = () => {
   const [isNavVisible, setIsNavVisible] = useState(true);
   const lastScrollY = useRef(0);
   
-  // NOTE: In the Fixed Root Scroller strategy, the scroll event happens on the #root element,
-  // not on a div inside App. We listen to the #root element.
+  // NOTE: In the Fixed Root Scroller strategy, the scroll event happens on the #root element.
 
   // Helper to process recurring rules
   const processRecurringTransactions = (
@@ -328,14 +327,14 @@ const App: React.FC = () => {
   if (!isLoaded) return null;
 
   return (
-    // App container is just a flex wrapper, min-h-full ensures it stretches in the scrollable root
+    // min-h-full ensures the app content stretches to fill the calculated #root height
     <div className="min-h-full w-full flex flex-col bg-transparent">
-      {/* Main content doesn't handle scroll anymore, it just expands. */}
+      {/* Main content expands to fill available space */}
       <main className="flex-1">
         {renderView()}
       </main>
 
-      {/* Navigation - Fixed position works relative to viewport inside the fixed root */}
+      {/* Navigation */}
       {currentView !== View.ADD && currentView !== View.SETTINGS && currentView !== View.EDIT && (
         <BottomNav 
             currentView={currentView} 
