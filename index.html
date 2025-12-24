@@ -64,10 +64,15 @@
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
       
+      :root {
+        --bg-light: #f0f2f5;
+        --bg-dark: #020617;
+      }
+
       html {
         height: 100%;
         width: 100%;
-        overflow: hidden;
+        overflow: hidden; /* Prevent elastic scrolling on body */
       }
 
       body {
@@ -76,29 +81,46 @@
         padding: 0;
         width: 100%;
         height: 100%;
-        /* Ensure dynamic viewport height support */
-        min-height: 100dvh;
-        overflow: hidden;
+        overflow: hidden; /* Prevent elastic scrolling on body */
         overscroll-behavior: none;
-        
-        /* Background Applied Directly to Body */
+        background-color: var(--bg-light); /* Fallback */
+      }
+      
+      /* 
+         Fixed Background Layer 
+         Using position: fixed and 100dvh ensures it covers the screen 
+         behind the address bar on iOS portrait mode.
+      */
+      #app-background {
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh; /* Dynamic Viewport Height */
+        z-index: -1;
+        pointer-events: none;
         transition: background-color 0.5s ease;
+        
+        /* Light Mode Gradient */
         background: radial-gradient(circle at 50% 50%, rgba(224, 242, 254, 0.8), rgba(236, 254, 255, 0) 50%),
                     radial-gradient(circle at 100% 0%, rgba(224, 231, 255, 0.8), rgba(224, 231, 255, 0) 50%),
                     radial-gradient(circle at 0% 100%, rgba(240, 253, 244, 0.8), rgba(240, 253, 244, 0) 50%);
-        background-color: #f0f2f5;
+        background-color: var(--bg-light);
         background-size: cover;
-        background-attachment: fixed;
       }
 
-      /* Dark Mode Background */
-      .dark body {
+      /* Dark Mode Background applied to the layer */
+      .dark #app-background {
         background: radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 1), rgba(15, 23, 42, 0) 50%),
                     radial-gradient(circle at 100% 0%, rgba(30, 27, 75, 0.3), rgba(30, 27, 75, 0) 50%),
                     radial-gradient(circle at 0% 100%, rgba(2, 44, 34, 0.3), rgba(2, 44, 34, 0) 50%);
-        background-color: #020617;
+        background-color: var(--bg-dark);
       }
       
+      .dark body {
+        background-color: var(--bg-dark);
+      }
+
       .no-scrollbar::-webkit-scrollbar {
         display: none;
       }
@@ -142,6 +164,9 @@
 </script>
 </head>
   <body class="text-slate-900 dark:text-slate-100 selection:bg-brand-500/30">
+    <!-- Fixed Background Layer -->
+    <div id="app-background"></div>
+    
     <!-- App Root -->
     <div id="root" class="h-full w-full relative z-10"></div>
     
