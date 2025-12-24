@@ -1,9 +1,20 @@
 import { GoogleGenAI } from "@google/genai";
 import { Transaction } from '../types';
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const apiKey = process.env.API_KEY;
+let ai: GoogleGenAI | null = null;
+
+if (apiKey) {
+  ai = new GoogleGenAI({ apiKey });
+} else {
+  console.warn("Gemini API Key is missing. AI features will be disabled.");
+}
 
 export const getBudgetAnalysis = async (transactions: Transaction[]): Promise<string> => {
+  if (!ai) {
+    return "API Key is missing. Please configure your .env file.";
+  }
+
   try {
     // Simplify data to send fewer tokens and focus on substance
     const simplifiedData = transactions.map(t => ({

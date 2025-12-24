@@ -10,7 +10,8 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     define: {
       // Polyfill process.env.API_KEY for the Gemini SDK
-      'process.env.API_KEY': JSON.stringify(env.API_KEY),
+      // Default to empty string if undefined to prevent build/runtime errors
+      'process.env.API_KEY': JSON.stringify(env.API_KEY || ''),
     },
   };
 });
