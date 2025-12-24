@@ -92,19 +92,34 @@ const App: React.FC = () => {
 
   // Initial Load from LocalStorage
   useEffect(() => {
-    const storedTxs = getStoredTransactions();
-    const storedRecurring = getStoredRecurringTransactions();
-    const storedLimits = getBudgetLimits();
-    const storedTheme = getStoredTheme();
+    const initApp = async () => {
+        // 1. Request Persistent Storage to prevent data loss on mobile
+        if (navigator.storage && navigator.storage.persist) {
+            try {
+                const isPersisted = await navigator.storage.persist();
+                console.log(`Storage Persistence Granted: ${isPersisted}`);
+            } catch (e) {
+                console.warn("Could not request storage persistence", e);
+            }
+        }
 
-    const result = processRecurringTransactions(storedTxs, storedRecurring);
+        // 2. Load Data
+        const storedTxs = getStoredTransactions();
+        const storedRecurring = getStoredRecurringTransactions();
+        const storedLimits = getBudgetLimits();
+        const storedTheme = getStoredTheme();
 
-    setTransactions(result.newTxs);
-    setRecurringTransactions(result.updatedRecurring);
-    setBudgetLimits(storedLimits);
-    setTheme(storedTheme);
-    
-    setIsLoaded(true);
+        const result = processRecurringTransactions(storedTxs, storedRecurring);
+
+        setTransactions(result.newTxs);
+        setRecurringTransactions(result.updatedRecurring);
+        setBudgetLimits(storedLimits);
+        setTheme(storedTheme);
+        
+        setIsLoaded(true);
+    };
+
+    initApp();
   }, []);
 
   // Auth & Cloud Sync Listener

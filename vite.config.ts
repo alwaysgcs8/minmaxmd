@@ -13,8 +13,16 @@ export default defineConfig(({ mode }) => {
     },
     define: {
       // Polyfill process.env.API_KEY for the Gemini SDK
-      // Default to empty string if undefined to prevent build/runtime errors
       'process.env.API_KEY': JSON.stringify(env.API_KEY || ''),
+      
+      // Explicitly define Firebase vars for static replacement
+      // This ensures code like process.env.VITE_FIREBASE_API_KEY compiles directly to the string value
+      'process.env.VITE_FIREBASE_API_KEY': JSON.stringify(env.VITE_FIREBASE_API_KEY || ''),
+      'process.env.VITE_FIREBASE_AUTH_DOMAIN': JSON.stringify(env.VITE_FIREBASE_AUTH_DOMAIN || ''),
+      'process.env.VITE_FIREBASE_PROJECT_ID': JSON.stringify(env.VITE_FIREBASE_PROJECT_ID || ''),
+      'process.env.VITE_FIREBASE_STORAGE_BUCKET': JSON.stringify(env.VITE_FIREBASE_STORAGE_BUCKET || ''),
+      'process.env.VITE_FIREBASE_MESSAGING_SENDER_ID': JSON.stringify(env.VITE_FIREBASE_MESSAGING_SENDER_ID || ''),
+      'process.env.VITE_FIREBASE_APP_ID': JSON.stringify(env.VITE_FIREBASE_APP_ID || ''),
     },
   };
 });

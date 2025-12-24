@@ -1,36 +1,39 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut as firebaseSignOut } from 'firebase/auth';
-import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
+import { getFirestore } from 'firebase/firestore';
 
-// Note: These values should be in your .env file
-// Example: VITE_FIREBASE_API_KEY=...
-
-// Safely access env variables. 
-// We use optional chaining on (import.meta as any).env to prevent runtime errors 
-// if the environment object is not strictly defined in the current context.
-const getEnv = (key: string) => {
-    return (import.meta as any).env?.[key];
-}
+// We use process.env here because we have configured vite.config.ts to 
+// statically replace these patterns with the actual string values.
+// This avoids issues where import.meta.env might be undefined in some environments.
 
 const firebaseConfig = {
-  apiKey: getEnv("VITE_FIREBASE_API_KEY") || "YOUR_API_KEY_HERE",
-  authDomain: getEnv("VITE_FIREBASE_AUTH_DOMAIN") || "YOUR_AUTH_DOMAIN_HERE",
-  projectId: getEnv("VITE_FIREBASE_PROJECT_ID") || "YOUR_PROJECT_ID_HERE",
-  storageBucket: getEnv("VITE_FIREBASE_STORAGE_BUCKET") || "YOUR_STORAGE_BUCKET_HERE",
-  messagingSenderId: getEnv("VITE_FIREBASE_MESSAGING_SENDER_ID") || "YOUR_MESSAGING_SENDER_ID_HERE",
-  appId: getEnv("VITE_FIREBASE_APP_ID") || "YOUR_APP_ID_HERE"
+  // @ts-ignore
+  apiKey: process.env.VITE_FIREBASE_API_KEY,
+  // @ts-ignore
+  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN,
+  // @ts-ignore
+  projectId: process.env.VITE_FIREBASE_PROJECT_ID,
+  // @ts-ignore
+  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET,
+  // @ts-ignore
+  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  // @ts-ignore
+  appId: process.env.VITE_FIREBASE_APP_ID
 };
 
-// Initialize only if config is valid (prevent crash on unconfigured download)
-let app, auth, db;
+// Initialize only if config is valid
+let app = null;
+let auth = null;
+let db = null;
+
 try {
-    // Basic check to see if apiKey is configured (not the default placeholder)
-    if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY_HERE") {
+    // Check if apiKey is present and not just an empty string
+    if (firebaseConfig.apiKey && firebaseConfig.apiKey.length > 0) {
         app = initializeApp(firebaseConfig);
         auth = getAuth(app);
         db = getFirestore(app);
     } else {
-        console.warn("Firebase config missing or default. Cloud features disabled.");
+        console.log("Running in offline mode (No Firebase config detected).");
     }
 } catch (e) {
     console.warn("Firebase initialization failed:", e);
@@ -39,7 +42,7 @@ try {
 export const googleProvider = new GoogleAuthProvider();
 
 export const signInWithGoogle = async () => {
-  if (!auth) throw new Error("Firebase not initialized. Check your .env configuration.");
+  if (!auth) throw new Error("Cloud Sync is not configured. Run in offline mode.");
   try {
     const result = await signInWithPopup(auth, googleProvider);
     return result.user;
