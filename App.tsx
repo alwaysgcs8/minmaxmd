@@ -319,8 +319,8 @@ const App: React.FC = () => {
   if (!isLoaded) return null;
 
   return (
-    // With html/body fixed to inset:0, we use h-full for the app container.
-    <div className="h-full w-full relative flex flex-col bg-transparent overflow-hidden">
+    // Use 100dvh (dynamic viewport height) to respect iOS address bar retraction
+    <div className="h-[100dvh] w-full relative flex flex-col bg-transparent overflow-hidden">
       {/* Content Area */}
       <main 
         ref={scrollContainerRef}
