@@ -1,4 +1,4 @@
-const CACHE_NAME = 'minmaxmd-v1';
+const CACHE_NAME = 'minmaxmd-v2';
 
 // Resources to cache immediately
 const PRECACHE_URLS = [
@@ -33,7 +33,7 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch Event: Network First for API/Dynamic, Cache First for Assets/CDNs
+// Fetch Event
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
@@ -42,21 +42,44 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Navigation requests (HTML): Network First, Fallback to Cache
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          // Check for valid response
+          if (!response || response.status !== 200 || response.type !== 'basic') {
+             // If network returns 404 or error, try cache
+             return caches.match('/index.html');
+          }
+          
+          // Cache the fresh copy
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
+          return response;
+        })
+        .catch(() => {
+          // Network failed, return cached index.html
+          return caches.match('/index.html');
+        })
+    );
+    return;
+  }
+
+  // Assets (JS, CSS, Images): Cache First, Fallback to Network
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      // Return cached response if found
       if (cachedResponse) {
         return cachedResponse;
       }
 
-      // Otherwise fetch from network
       return fetch(event.request).then((response) => {
-        // Check if we received a valid response
         if (!response || response.status !== 200 || response.type !== 'basic' && response.type !== 'cors') {
           return response;
         }
 
-        // Cache valid responses (including CDNs like esm.sh, tailwind, fonts, flaticon)
         const responseToCache = response.clone();
         caches.open(CACHE_NAME).then((cache) => {
           cache.put(event.request, responseToCache);
