@@ -319,7 +319,8 @@ const App: React.FC = () => {
   if (!isLoaded) return null;
 
   return (
-    <div className="h-full w-full relative flex flex-col bg-transparent">
+    // Use h-screen and h-[100dvh] to ensure we fill the dynamic viewport completely
+    <div className="h-screen h-[100dvh] w-full relative flex flex-col bg-transparent">
       {/* Content Area */}
       <main 
         ref={scrollContainerRef}
