@@ -188,7 +188,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ transactions, budgetLimits
         // Last 5 years
         for(let i=4; i>=0; i--) {
             const d = new Date(now.getFullYear() - i, 0, 1);
-            const key = `${d.getFullYear()}`;
+            const key = `${d.getFullYear()}-${d.getMonth()}`;
             data[key] = {
                 date: key,
                 displayDate: key,
@@ -483,10 +483,10 @@ export const Analytics: React.FC<AnalyticsProps> = ({ transactions, budgetLimits
       {isCustomizing && (
         <>
             <div 
-                className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 transition-opacity"
+                className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60] transition-opacity"
                 onClick={() => setIsCustomizing(false)}
             />
-            <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 z-50 rounded-t-[2.5rem] p-6 pb-safe-bottom shadow-2xl animate-in slide-in-from-bottom duration-300 border-t border-white/10">
+            <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 z-[70] rounded-t-[2.5rem] p-6 pb-safe-bottom shadow-2xl animate-in slide-in-from-bottom duration-300 border-t border-white/10">
                 <div className="flex justify-between items-center mb-6">
                     <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
                         <Layout className="text-brand-500" /> Customize Dashboard
